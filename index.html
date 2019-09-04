@@ -1,7 +1,7 @@
 <html>
 	<head>
     <link rel="manifest" href="./manifest.webmanifest">
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#000">
     <link rel="icon" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
@@ -9,12 +9,143 @@
 	</head>
 	<body>
 		<h1>SMLDEV Blog</h1>
-		<div>
+    <div>
+      <h2>Transformando este blog em uma <b>PWA</b> em 5 minutos</h2>
+    
+      <p>Primeira coisa que queria fazer no <i>blog</i>, é transformá-lo em uma <b>PWA</b> (<i>Progressive Web App</i>), para começar com o pé direito. Dessa forma, o blog poderia ser acessado em praticamente qualquer aparelho, sem prejudicar o leitor e já dando uma experiência de uso muito boa.</p>
+
+      <p>O objetivo aqui não é explicar o conceito de uma <b>PWA</b>, mas de forma bem resumida, uma <b>PWA</b> é um conjunto de boas práticas que visa tenta dar para o usuário uma experiência agradável de uso no seu <i>site</i> ou aplicação.</p>
+
+      <p>No <b>Chrome</b>, encontramos uma ferramenta muito legal que é capaz de avaliar algumas dessas práticas e mostrar onde o site está falhando, chamada <b>Audit</b>. Também é possível utilizar essa mesma ferramenta via linha de comando, para caso não queira utilizar o <b>Chrome</b>. Para mais informações, acesse o seu repositório no <b>github</b> (<a href="https://github.com/GoogleChrome/lighthouse">https://github.com/GoogleChrome/lighthouse</a>).</p>
+      
+      <img src="./img1.png" />
+      
+      <p><i>Obs.: Para subir a aplicação em 'localhost' utilizei o pacote 'http-server' instalado de forma global via 'npm' (veja o github do projeto: <a href="https://github.com/http-party/http-server">https://github.com/http-party/http-server</a>).</i></p>
+      
+      <p>Executando a análise, podemos ver aonde nossa aplicação está falhando. São tantos pontos de falha, que a tornam uma não PWA. Porém, todos eles são incrivelmente simples de resolver. Invista um tempo olhando cada item e entendendo o motivo dele ser importante.</p>
+      
+      <img src="./img2.png" />
+    
+      <p>Basicamente, precisamos criar três arquivos, adicionar algumas linhas de código, e teremos todos (ou praticamente todos) os itens resolvidos, ou seja, teremos nossa <b>PWA</b>. Mágica?</p>
+      
+      <p>O primeiro dele é o arquivo <i>manifest</i>. Sem entrar em detalhes, é nele que adicionamos informações sobre a nossa aplicação. Essas informações são usadas por diversos sistemas operacionais e <i>browser</i> para definir nome, cores, logo, link da aplicação em uma loja entre outras informações.</p>
+
+      <p>Mãos a massa, vamos criar um arquivo na raiz do projeto, chamado <i>manifest.webmanifest</i> com o seguinte conteúdo:</p>
+    
+      <pre>
+        {
+          "name": "Blog do Samuel Blum Vorpagel",
+          "short_name": "SML Blog",
+          "start_url": "/",
+          "display": "standalone",
+          "theme_color": "#000",
+          "background_color":"#000",
+          "icons": [{
+            "src": "logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+          }]
+        }
+      </pre>
+    
+      <p>Existem outras diversas informações possíveis de serem adicionadas, mas essas são as mínimas para criarmos nossa <b>PWA</b>.</p>
+
+      <p>Este arquivo <i>manifest</i> contém uma logo com 512x512 <i>pixels</i>. Adicione uma logo com essas dimensões com o nome 'logo.png'.</p>
+
+      <p>Por fim, vamos criar nosso último terceiro e último arquivo, o arquivo de <i>service worker</i>. Também sem entrar em detalhes, imagine um <i>service worker</i> como uma camada entre o browser e o sistema operacional. Onde é possível adicionar códigos que, entre outras coisas, escutam eventos e manipulam respostas padrões. O <i>service worker</i> merece diversos artigos só para ele, portanto, por hora, usaremos ele "apenas" para tornar a nossa página possível de ser executada sem conexão com a internet.</p>
+
+      <p>Assim como o <i>manifest</i>, crie um arquivo na raiz, com o nome 'sw.js', com o seguinte conteúdo:</p>    
+    
+      <pre>
+        self.addEventListener('install', function(event) {
+          event.waitUntil(
+            caches.open('sml-cache-v2').then(function(cache) {
+              return cache.add('index.html');
+            })
+          );
+        });
+ 
+        self.addEventListener('fetch', function(event) {
+          event.respondWith(
+            caches.match(event.request).then(function(response) {
+              return response || fetch(event.request);
+            })
+          );
+        });
+      </pre>
+
+      <p>Por fim, vamos adicionar algumas chamadas no nosso 'index.html'. Vamos chamar nosso <i>service worker</i> e registra-lo, testando se o mesmo é suportado pelo navegador.</p>
+
+      <pre>
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('sw.js');
+        }
+      </pre>
+
+      <p>Adicionar a chamada ao manifest:</p>
+
+      <pre>
+        &lt;link rel="manifest" href="./manifest.webmanifest"&gt;
+      </pre>
+
+      <p>Também vamos definir o comportamento de nossa viewport, adicionar chamadas para as logos, tanto browser quanto ios, e por fim, definirmos a cor de tema de nossa aplicação.</p>
+
+      <pre>
+        &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+        &lt;meta name="theme-color" content="#000"&gt;
+        &lt;link rel="icon" href="logo.png"&gt;
+        &lt;link rel="apple-touch-icon" href="logo.png"&gt;
+      </pre>
+
+      <p>Chegando a este 'index.html' para o <i>blog</i>:</p>
+
+      <pre> 
+        &lt;html&gt;
+          &lt;head&gt;
+            &lt;link rel="manifest" href="./manifest.webmanifest"&gt;
+            &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+            &lt;meta name="theme-color" content="#000"&gt;
+            &lt;link rel="icon" href="logo.png"&gt;
+            &lt;link rel="apple-touch-icon" href="logo.png"&gt;
+            &lt;title&gt;SMLDEV Blog&lt;/title&gt;
+          &lt;/head&gt;
+          &lt;body&gt;
+            &lt;h1&gt;SMLDEV Blog&lt;/h1&gt;
+		        &lt;div&gt;
+			        &lt;h&gt;Início...&lt;/h2&gt;
+			        &lt;p&gt;Este blog, tem como objetivo primário de aprendizado e disseminar conceitos de programação, principalmente voltado para o ambiente WEB.&lt;/p&gt;
+			        &lt;p&gt;A sua ideia é apresentar algum conceito, aprofundar nele e por fim, aplicar na própria construção do blog.&lt;/p&gt;
+			        &lt;p&gt;Por hora, ele é composto apenas por um "index.html" sem graça, mas até onde será que podermos chegar?&lt;/p&gt;
+		        &lt;/div&gt;
+	        &lt;/body&gt;
+          &lt;script&gt;
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.register('sw.js');
+            }
+          &lt;/script&gt;
+        &lt;/html&gt;
+      </pre>
+
+      <p>Com isso, podemos executar novamente a análise e notar que temos uma PWA</p>
+
+      <img src="./img3.png" />
+
+      <p>Não apenas isso, demos a possibilidade, de forma simples, do usuário instalar nosso <i>blog</i> em seu <i>Android</i>, <i>iOS</i>, <i>Windowns</i> ou <i>Linux</i> e rodar nosso <i>blog</i> <i>offline</i>.</p>
+
+      <img src="./img4.gif" />
+
+      <p>Autor: Samuel Blum Vorpagel.</p>
+
+      <p>Código completo deste e dos demais artigos no <b>github</b> <a href="https://github.com/sbvorpagel/blog">https://github.com/sbvorpagel/blog</a></p>
+    </div>
+    
+    <div>
 			<h2>Início...</h2>
 			<p>Este blog, tem como objetivo primário de aprendizado e disseminar conceitos de programação, principalmente voltado para o ambiente WEB.</p>
 			<p>A sua ideia é apresentar algum conceito, aprofundar nele e por fim, aplicar na própria construção do blog.</p>
 			<p>Por hora, ele é composto apenas por um "index.html" sem graça, mas até onde será que podermos chegar?</p>
-
+      <p>Autor: Samuel Blum Vorpagel.</p>
+      <p>Código completo deste e dos demais artigos no <b>github</b> <a href="https://github.com/sbvorpagel/blog">https://github.com/sbvorpagel/blog</a></p>
 		</div>
 	</body>
   <script>
@@ -22,4 +153,9 @@
       navigator.serviceWorker.register('sw.js');
     }
   </script>
+  <style>
+    img {
+      max-width: 100%;
+    }
+  </style>
 </html>
