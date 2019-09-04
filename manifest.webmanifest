@@ -2,6 +2,7 @@
 {
   "name": "Blog do Samuel Blum Vorpagel",
   "short_name": "SML Blog",
+  "scope": "/",
   "start_url": "/blog",
   "display": "standalone",
   "theme_color": "#000",
