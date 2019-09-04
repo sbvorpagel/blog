@@ -2,7 +2,7 @@
 {
   "name": "Blog do Samuel Blum Vorpagel",
   "short_name": "SML Blog",
-  "start_url": "/blog",
+  "start_url": "https://smldev.com.br/blog",
   "display": "standalone",
   "theme_color": "#000",
   "background_color":"#000",
